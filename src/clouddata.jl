@@ -8,7 +8,7 @@ Set the floating point precision to `Float` (default: `Float32`).
 """
 function loadCloudTracks(
   files::String...;
-  structname::String="cloud",
+  structname::String="filtered_trajectories",
   Float::DataType=Float32
 )
   # Initialise
@@ -16,9 +16,9 @@ function loadCloudTracks(
   # Loop over all mat files
   @pm.showprogress 1 "load cloud tracks..." for (i, file) in enumerate(files)
     # Read data from mat files
-    t, lonlat = readMAT(file, structname)
+    t, latlon = readMAT(file, structname)
     # Store data in Julia format as Vector of CloudTrack structs
-    storeMAT!(tracks, t, lonlat, i, file; Float)
+    storeMAT!(tracks, t, latlon, i, file; Float)
   end #loop over files
 
   return tracks
@@ -34,8 +34,8 @@ function readMAT(file::String, structname::String="cloud")
   # Send file name to MATLAB
   data = MAT.matread(file)
   t = vec(data[structname]["timestamp"])
-  lonlat = vec(data[structname]["centrLonLat"])
-  return t, lonlat
+  latlon = vec(data[structname]["centrLatLon"])
+  return t, latlon
 end
 
 
@@ -43,20 +43,20 @@ end
     storeMAT!(
       tracks::Vector{CloudData},
       t::Array,
-      lonlat::Array,
+      latlon::Array,
       fileID::Int,
       filename::String;
       Float::DataType=Float32
     )
 
-Append the vector with cloud `tracks` by timestamps `t` and coordinates `lonlat`
+Append the vector with cloud `tracks` by timestamps `t` and coordinates `latlon`
 using the floating point precision set by `Float` (default: `Float32`) for the
 positional data. Pass on `fileID` and `filename` to the metadata.
 """
 function storeMAT!(
   tracks::Vector{CloudData},
   t::Array,
-  lonlat::Array,
+  latlon::Array,
   fileID::Int,
   filename::String;
   Float::DataType=Float32
@@ -64,7 +64,7 @@ function storeMAT!(
   # Transform MATLAB data into Julia Format and store as CloudTrack struct in a vector
   for i = 1:length(t)
     data = DataFrame(time = vec(DateTime.(t[i], "yyyymmddHHMM")),
-      lat = Float.(lonlat[i][:,2]), lon = Float.(lonlat[i][:,1]))
+      lat = Float.(latlon[i][:,1]), lon = Float.(latlon[i][:,2]))
     # Determine predominant trajectory direction, inflection points, and remove duplicate entries
     flex, useLON = preptrack!(data)
     isempty(flex) && continue
