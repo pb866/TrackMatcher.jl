@@ -12,6 +12,11 @@ Description
 
 
 
+Acceptance Criteria
+--------------------
+
+- [ ]
+
 Definition of Done
 ------------------
 
@@ -26,8 +31,3 @@ Definition of Done
   - [ ] A PR was made and reviewed for any new code
   - [ ] All CI checks passed
   - [ ] Related feature branch(es) merged and deleted without conflict
-
-Acceptance Criteria
---------------------
-
-- [ ]
