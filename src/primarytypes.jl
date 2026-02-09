@@ -796,7 +796,7 @@ struct CloudSet{T} <: PrimarySet{T}
   function CloudSet{T}(
     folders::String...;
     savedir::Union{String,Bool}="abs",
-    structname::String="cloud",
+    structname::String="filtered_trajectories",
     remarks=nothing
   ) where T
     # Return empty CloudSet, if no folders are passed to constructor
